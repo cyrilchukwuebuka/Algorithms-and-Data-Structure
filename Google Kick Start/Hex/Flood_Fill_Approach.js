@@ -1,5 +1,6 @@
 //////////////////////////////////////////
 //////////// FLOOD FILL APPROACH /////////
+//////////////////// N^4 /////////////////
 //////////////////////////////////////////
 
 const _readline = require("readline");
@@ -56,6 +57,18 @@ function countStones(originalBoard) {
     return [blueStoneCount, redStoneCount];
 }
 
+function deepCopy(board) {
+    const newBoard = [];
+    for (let i = 0; i < board.length; i++) {
+        const rowData = []
+        for (let j = 0; j < board.length; j++) {
+            rowData.push(board[i][j]);
+        }
+        newBoard.push(rowData);
+    }
+    return newBoard
+}
+
 function flood(board, row, col, boardSize, colour) {
     const directions = [[0, 1], [-1, 1], [-1, 0], [0, -1], [1, -1], [1, 0]];
     board[row][col] = colour.toLowerCase();
@@ -86,18 +99,6 @@ function checkWinner(board, boardSize) {
     }
 
     return '.'
-}
-
-function deepCopy(board) {
-    const newBoard = [];
-    for (let i = 0; i < board.length; i++) {
-        const rowData = []
-        for (let j = 0; j < board.length; j++) {
-            rowData.push(board[i][j]);
-        }
-        newBoard.push(rowData);
-    }
-    return newBoard
 }
 
 function solution(originalBoard, boardSize) {

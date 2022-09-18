@@ -1,9 +1,9 @@
 const _readline = require("readline");
-let rl = _readline.createInterface(process.stdin, process.stdout);
-// const fs = require("fs");
-// const rl = _readline.createInterface({
-//     input: fs.createReadStream("input.txt"),
-// });
+// let rl = _readline.createInterface(process.stdin, process.stdout);
+const fs = require("fs");
+const rl = _readline.createInterface({
+    input: fs.createReadStream("../input.txt"),
+});
 
 function parseInput(input) {
     let line = 0;
