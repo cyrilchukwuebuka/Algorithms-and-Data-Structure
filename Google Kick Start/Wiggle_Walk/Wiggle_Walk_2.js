@@ -20,47 +20,35 @@ function parseInput(input) {
     return testData;
 }
 
-const COORDINATES = {
-    'N': [-1, 0],
-    'S': [1, 0],
-    'E': [0, 1],
-    'W': [0, -1]
-}
-
-function addCoordinate(instruction, cordinates, curCord) {
-    for (cord in COORDINATES) {
-        if (cord === instruction) {
-            cordinates[cord] = [curCord[0] + COORDINATES[cord][0] * 2, curCord[1] + COORDINATES[cord][1] * 2]
-        } else {
-            cordinates[cord] = [curCord[0] + COORDINATES[cord][0] + 1, curCord[1] + COORDINATES[cord][1] + 1]
-        }
-    }
-}
-
-function move(instruction, curCord, visitedCells) {
-    // visitedCells[curCord.join('')] = {};
-    console.log(curCord)
-    // addCoordinate(instruction, visitedCells[curCord.join('')], curCord)
-    // const nextCord = [curCord[0] + COORDINATES[instruction][0], curCord[1] + COORDINATES[instruction][1]];
-    // while(nextCord.join('') in visitedCells) {
-    //     console.log(nextCord)
-    // }
-}
-
 function runTestCase(data) {
     const { testNumber, robotManual, instructions } = data;
     const [numOfInstructions, numOfRows, numOfCols, startRow, startCol] =
         robotManual;
     const visitedCells = {};
-    let curCord = [startRow, startCol];
+    visitedCells[`${startRow}${startCol}`] = {}
+    let curRow = startRow
+    let curCol = startCol
 
     for (let instruction of instructions) {
-        // console.log(instruction)
-        move(instruction, curCord, visitedCells)
-        // curCord = move(instruction, curCord, visitedCells)
+        let prevRow = curRow;
+        let prevCol = curCol;
+        let movesFromCurCell = visitedCells[`${curRow}${curCol}`]
+        let curCord = move(movesFromCurCell, instruction, curRow, curCol)
+        curRow = curCord[0]
+        curCol = curCord[1]
+        while (visitedCells[`${curRow}${curCol}`]) {
+            movesFromCurCell = visitedCells[`${curRow}${curCol}`]
+            curCord = move(movesFromCurCell, instruction, curRow, curCol)
+            curRow = curCord[0]
+            curCol = curCord[1]
+        }
+
+        visitedCells[`${curRow}${curCol}`] = {}
+        addCoordinate(visitedCells[`${curRow}${curCol}`], REVERSE[instruction], prevRow, prevCol)
+        addCoordinate(visitedCells[`${prevRow}${prevCol}`], instruction, curRow, curCol)
     }
 
-    // console.log(`Case #${testNumber}: ${currentRow} ${currentCol}`);
+    console.log(`Case #${testNumber}: ${curRow} ${curCol}`);
 }
 
 function runAllTests(lines) {
@@ -72,3 +60,29 @@ const lines = [];
 rl.on("line", (line) => lines.push(line.trim())).on("close", () =>
     runAllTests(lines)
 );
+
+const COORDINATES = {
+    'N': [-1, 0],
+    'S': [1, 0],
+    'E': [0, 1],
+    'W': [0, -1]
+}
+
+const REVERSE = {
+    'N': 'S',
+    'S': 'N',
+    'E': 'W',
+    'W': 'E',
+}
+
+function addCoordinate(cell, i, row, col) {
+    cell[i] = [row + COORDINATES[i][0], col + COORDINATES[i][1]]
+}
+
+function move(movesFromCurCell, i, row, col) {
+    if (movesFromCurCell[1]) {
+        return movesFromCurCell[i]
+    }
+
+    return [row + COORDINATES[i][0], col + COORDINATES[i][1]]
+}

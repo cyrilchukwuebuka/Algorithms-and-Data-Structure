@@ -1,9 +1,9 @@
 const _readline = require("readline");
-let rl = _readline.createInterface(process.stdin, process.stdout);
-// const fs = require("fs");
-// const rl = _readline.createInterface({
-//     input: fs.createReadStream("../input.txt"),
-// });
+// let rl = _readline.createInterface(process.stdin, process.stdout);
+const fs = require("fs");
+const rl = _readline.createInterface({
+    input: fs.createReadStream("../input.txt"),
+});
 
 function parseInput(input) {
     let line = 0;
@@ -12,30 +12,31 @@ function parseInput(input) {
 
     const testData = [];
     for (let testNumber = 1; testNumber <= numOfTestCases; testNumber++) {
-        const [numFriends, numForbiddenTypes, binaryOptions] = input[line++].split(' ').map(data => Number(data));
+        const [numFriends, numForbiddenMilkTea, binaryOptions] = input[line++].split(' ').map(data => Number(data));
 
-        const friendsOptions = [];
+        const friendsPreferences = [];
         for (let i = 0; i < numFriends; i++) {
             const data = input[line++];
-            friendsOptions.push(data);
+            friendsPreferences.push(data);
         }
 
-        const forbiddenTypes = [];
-        for (let i = 0; i < numForbiddenTypes; i++) {
+        const forbiddenMilkTea = [];
+        for (let i = 0; i < numForbiddenMilkTea; i++) {
             const data = input[line++];
-            forbiddenTypes.push(data);
+            forbiddenMilkTea.push(data);
         }
 
-        testData.push({ testNumber, friendsOptions, forbiddenTypes, binaryOptions });
+        testData.push({ testNumber, friendsPreferences, forbiddenMilkTea, binaryOptions });
     }
 
     return testData;
 }
 
 function runTestCase(data) {
-    const { testNumber, friendsOptions, forbiddenTypes, binaryOptions } = data;
-    const result = solution(friendsOptions, forbiddenTypes, binaryOptions)
-    let score = null;
+    const { testNumber, friendsPreferences, forbiddenMilkTea, binaryOptions } = data;
+    const result = solution(friendsPreferences, forbiddenMilkTea, binaryOptions)
+    let score = 0
+    ;
     if (result.length > 0) {
         score = result[0].score
     }
@@ -119,12 +120,12 @@ function createSet(set) {
     return newSet;
 }
 
-function validScoreTeas(friendsOptions, targetCount, binaryOptions, scoreTeaSet, scoreTeaSetList) {
+function validScoreTeas(friendsPreferences, targetCount, binaryOptions, scoreTeaSet, scoreTeaSetList) {
     for (let i = 1; i <= binaryOptions; i++) {
         const prevScoreTeaSet = scoreTeaSetList[i - 1];
         let newSet = createSet(prevScoreTeaSet.set);
         if (newSet.length > targetCount) {
-            score(friendsOptions, newSet)
+            score(friendsPreferences, newSet)
             newSet = sortFilter(newSet, targetCount)
         }
         scoreTeaSet = new ScoreTeaSet(newSet, targetCount);
@@ -145,15 +146,15 @@ function filterForbiddenTea(scoreSet, forbiddenSet) {
     return newSet
 }
 
-function solution(friendsOptions, forbiddenTypes, binaryOptions) {
+function solution(friendsPreferences, forbiddenMilkTea, binaryOptions) {
     const scoreTeaSetList = new Array();
     const targetCount = Math.min(binaryOptions, (2 ** binaryOptions) - 1) + 1;
     let scoreTeaSet = new ScoreTeaSet([new ScoreTea(0, '')]);
     scoreTeaSetList.push(scoreTeaSet);
 
-    validScoreTeas(friendsOptions, targetCount, binaryOptions, scoreTeaSet, scoreTeaSetList);
+    validScoreTeas(friendsPreferences, targetCount, binaryOptions, scoreTeaSet, scoreTeaSetList);
 
     const finalScoreSetResult = scoreTeaSetList[scoreTeaSetList.length - 1].set
 
-    return filterForbiddenTea(finalScoreSetResult, forbiddenTypes);
+    return filterForbiddenTea(finalScoreSetResult, forbiddenMilkTea);
 }
